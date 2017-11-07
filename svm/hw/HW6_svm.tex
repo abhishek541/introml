@@ -217,148 +217,165 @@ showstringspaces=false            %
 \begin{document}
 
 \title{Introduction to Machine Learning\\
-Homework 5:  Gradient Calculations and Nonlinear Optimization}
+Homework 6:  Support Vector Machines}
 \author{Prof. Sundeep Rangan}
 \date{}
 
 \maketitle
 
-Submit answers only to problems 1, 3 and 4(b) and (c).  You do not need to answer 2 or 4(a).
-But, make sure you know how to do all the problems.
-
 \begin{enumerate}
 
-\item Suppose we want to fit a model,
-\[
-    \hat{y} = \frac{1}{w_0 + \sum_{j=1}^d w_jx_j},
-\]
-for parameters $\wbf$. Given training data $(\xbf_i,y_i)$, $i=1,\ldots,n$,
-a nonlinear least squares fit could use the loss function,
-\[
-    J(\wbf) = \sum_{i=1}^n \left[y_i -
-        \frac{1}{w_0 + \sum_{j=1}^d w_jx_{ij}}\right]^2
-\]
+\item Consider the data set for four points with
+features $\xbf_i=(x_{i1},x_{i2})$ and binary class
+labels $y_i=\pm 1$.
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|} \hline
+$x_{i1}$ & 0 & 1 & 1 & 2 \\ \hline
+$x_{i2}$ & 0 & 0.3 & 0.7 & 1 \\ \hline
+$y_i$ & -1 & -1 & 1 & 1 \\ \hline
+\end{tabular}
+\end{center}
+
 \begin{enumerate}[(a)]
-\item Find a function $g(\zbf)$ and matrix $\Abf$ such that
-the loss function is given by,
+\item Find a linear classifier that separates the two classes.
+Your classifier should be of the form
 \[
-    J(\wbf) = g(\zbf), \quad \zbf = \Abf\wbf,
+    \hat{y} = \begin{cases}
+        1 & \mbox{if } b + w_1 x_1 + w_2 x_2 > 0 \\
+        -1 & \mbox{if } b + w_1 x_1 + w_2 x_2 < 0
+    \end{cases}
 \]
-and $g(\zbf)$ is factorizable, meaning $g(\zbf) = \sum_i g_i(z_i)$ for
-some functions $g_i(z_i)$.
+State the intercept $b$ and weights $w_1$ and $w_2$ for your classifier.
+Note there is no unique answer as there are multiple linear classifiers
+that could separate the classes.
 
-\item What is the gradient $\nabla J(\wbf)$?
+\item Find the maximum $\gamma$ such that
+\[
+    y_i(b+w_1x_{i1} + w_{i2}x_{i2}) \geq \gamma, \mbox{ for all } i,
+\]
+for the classifier in part (a)?
 
-\item What is the gradient descent update for $\wbf$?
+\item Compute the margin of the classifier
+\[
+    m = \frac{\gamma}{\|\wbf\|}, \quad \|\wbf\|= \sqrt{ w_1^2 + w_2^2 }.
+\]
 
-\item Write a few lines of python code to compute the loss function $J(\wbf)$ and
-$\nabla J(\wbf)$.
+\item Which samples $i$ are on the margin for your classifier?
 \end{enumerate}
 
-\item In this problem, we will see why gradient descent can often exhibit
-very slow convergence, even on apparently simple functions.
-Consider the objective function,
-\[
-    J(\wbf) = \frac{1}{2}b_1w_1^2 + \frac{1}{2}b_2w_2^2,
-\]
-defined on a vector $\wbf=(w_1,w_2)$ with constants $b_2 > b_1 > 0$.
-\begin{enumerate}[(a)]
-  \item What is the gradient $\nabla J(\wbf)$?
-  \item What is the minimum $\wbf^* = \argmin_{\wbf} J(\wbf)$?
-  \item Part (b) shows that we can minimize $J(\wbf)$ easily by hand.
-  But, suppose we tried to minimize it via gradient descent.
-  Show that the gradient descent update of $\wbf$ with a step-size $\alpha$
-has the form,
-\[
-    w_1^{k+1} = \rho_1 w_1^k, \quad w_2^{k+1} = \rho_2 w_2^k,
-\]
-for some constants $\rho_i$, $i=1,2$.  Write $\rho_i$ in terms of
-$b_i$ and the step-size $\alpha$.
-  \item For what values $\alpha$ will gradient descent converge to the minimum? That is, what step sizes guarantee that $\wbf^k \arr \wbf^*$.
+\item  Consider the data set with scalar features $x_i$
+and binary class labels $y_i=\pm 1$.
 
-\item Take $\alpha = 2/(b_1+b_2)$.  It can be shown that this choice of $\alpha$ results in the fastest convergence.  You do not need to show this.
-But, show that with this selection of $\alpha$,
-\[
-    \|\wbf^k\| = C^k \|\wbf^0\|, \quad C = \frac{\kappa-1}{\kappa+1 }, \quad
-    \kappa = \frac{b_2}{b_1}.
-\]
-The term $\kappa$ is called the \emph{condition number}.  The above calculation
-shows that when $\kappa$ is very large, $C \approx 1$ and the convergence
-of gradient descent is slow.  In general, gradient descent performs poorly
-when the problems are ill-conditioned like this.
-\end{enumerate}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|c|} \hline
+$x_i$ & 0 & 1.3 & 2.1 & 2.8 & 4.2 & 5.7 \\ \hline
+$y_i$ & -1 & -1 & -1 & 1 & -1 & 1 \\ \hline
+\end{tabular}
+\end{center}
 
-\item \emph{Matrix minimization}.  Consider the problem of finding a matrix
-$\Pbf \in \R^{m \x m}$ to minimize the loss function,
+Consider a linear classifier for this data of the form,
 \[
-    J(\Pbf) = \sum_{i=1}^n \left[ \frac{z_i}{y_i} - \ln(z_i) \right],
+    \hat{y} = \begin{cases}
+        1  & z > 0 \\
+        -1 & z < 0,
+        \end{cases}
     \quad
-    z_i = \xbf_i\tran \Pbf \xbf_i.
+    z = x-t,
 \]
-The problem arises in wireless communications where an $m$-antenna receiver wishes
-to estimate a spatial covariance matrix $\Pbf$ from $n$ power measurements.
-In this setting, $y_i > 0$ is the $i$-th receive power measurement and $\xbf_i$
-is the beamforming direction for that measurement.  In reality, the quantities
-would be complex, but for simplicity we will just look at the real-valued case.
-See the following article for more details:
-\begin{quote}
-  Eliasi, Parisa A., Sundeep Rangan, and Theodore S. Rappaport. ``Low-rank spatial channel estimation for millimeter wave cellular systems," \emph{IEEE Transactions on Wireless Communications} 16.5 (2017): 2748-2759.
-\end{quote}
+where $t$ is a threshold.  For each threshold $t$, let $J(t)$
+denote the sum hinge loss,
+\[
+    J(t) = \sum_i \epsilon_i, \quad \epsilon_i = \max(0, 1-y_iz_i).
+\]
+
 \begin{enumerate}[(a)]
-\item What is the gradient $\nabla_{\Pbf} z_i$?
+\item Write a short python program to plot $J(t)$ vs.\ $t$ for
+100 values of $t$ in the interval $t \in [0,5]$.
 
-\item What is the gradient $\nabla_{\Pbf} J(\Pbf)$?
+\item Based on the plot, what is one value of $t$ that minimizes
+$J(t)$.
 
-\item Write a few lines of python code to evaluate $J(\Pbf)$ and
-$\nabla_{\Pbf} J(\Pbf)$ given data $\xbf_i$ and $y_i$.  You can use a for loop.
+\item For the value of $t$ in part (b), find the corresponding
+slack variables $\epsilon_i$.
 
-\item See if you can rewrite (c) without a for loop.  You will need Python broadcasting.
-\end{enumerate}
-
-\item \emph{Nested optimization}.  Suppose we are given a loss function
-$J(\wbf_1,\wbf_2)$ with two parameter vectors $\wbf_1$ and $\wbf_2$.
-In some cases, it is easy to minimize over one of the sets of parameters, say
-$\wbf_2$, while holding the other parameter vector (say, $\wbf_1$) constant.
-In this case, one could perform the following \emph{nested} minimization:
-Define
-\[
-    J_1(\wbf_1) := \min_{\wbf_2} J(\wbf_1,\wbf_2), \quad
-    \wbfhat_2(\wbf_1) := \argmin_{\wbf_2} J(\wbf_1,\wbf_2),
-\]
-which represent the minimum and argument of the loss function over $\wbf_2$
-holding $\wbf_1$ constant.   Then,
-\[
-    \wbfhat_1 = \argmin_{\wbf_1} J_1(\wbf_1) = \argmin_{\wbf_1} \min_{\wbf_2}
-    J(\wbf_1,\wbf_2).
-\]
-Hence, we can find the optimal $\wbf_1$ by minimizing $J_1(\wbf_1)$
-instead of minimizing $J(\wbf_1,\wbf_2)$ over $\wbf_1$ and $\wbf_2$.
-\begin{enumerate}[(a)]
-\item Show that the gradient of $J_1(\wbf_1)$ is given by
-\[
-    \nabla_{\wbf_1} J_1(\wbf_1) = \left. \nabla_{\wbf_1} J(\wbf_1,\wbf_2)\right|_{\wbf_2=\wbfhat_2}.
-\]
-Thus, given $\wbf_1$, we can evaluate the gradient from (i) solve the minimization
-$\wbfhat_2:= \argmin_{\wbf_2} J(\wbf_1,\wbf_2)$; and (ii) take the gradient
-$\nabla_{\wbf_1} J(\wbf_1,\wbf_2)$ and evaluate at $\wbf_2 = \wbfhat_2$.
-
-\item Suppose we want to minimize a nonlinear least squares,
-\[
-    J(\abf,\bbf) := \sum_{i=1}^n \left( y_i -
-        \sum_{j=1}^d b_j e^{-a_jx_i} \right)^2,
-\]
-over two parameters $\abf$ and $\bbf$.  Given parameters $\abf$,
-describe how we can minimize over $\bbf$.  That is, how can we compute,
-\[
-    \hat{\bbf} := \argmin_{\bbf} J(\abf,\bbf).
-\]
-
-\item In the above example, how would we compute the gradients,
-\[
-    \nabla_\abf J(\abf,\bbf).
-\]
+\item Which samples $i$ violate the margin ($\epsilon_i > 0$)
+and which samples $i$ are misclassified ($\epsilon_i > 1$).
 
 \end{enumerate}
 
+\item
+Consider an image recognition problem, where an image $\Xbf$
+and filter $\Wbf$ are $4 \x 4$ matrices:
+\[
+    \Xbf = \left[
+        \begin{array}{cccc}
+        0 & 0 & 0 & 0 \\
+        0 & 0 & 1 & 0 \\
+        0 & 0 & 1 & 0 \\
+        0 & 0 & 1 & 0
+        \end{array} \right], \quad
+    \Wbf = \left[
+        \begin{array}{cccc}
+        0 & 0 & 0 & 0 \\
+        0 & 1 & 1 & 0 \\
+        0 & 1 & 1 & 0 \\
+        0 & 0 & 0 & 0
+        \end{array} \right].
+\]
+\begin{enumerate}[(a)]
+\item Recall that in linear classification, the $4 \x 4$
+image matrices $\Xbf$ and $\Wbf$
+can be represented as 16-dimensional vectors, $\xbf = \mathrm{vec}(\Xbf)$
+and $\wbf = \mathrm{vec}(\Wbf)$ by stacking the columns of the matrices
+vertically. What are $\xbf$ and $\wbf$ for the matrices above.
+
+\item What is the inner product $z = \wbf\tran \xbf$.
+
+\item What is the inner product $z = \wbf\tran \xbf_{\rm right}$ where
+$\xbf_{\rm right}$ is
+the vector corresponding to the matrix $\Xbf$ right shifted by one pixel
+with the left column filled with zeros.
+
+\item What is the inner product $z = \wbf\tran \xbf_{\rm left}$ where
+$\xbf_{\rm left}$ is
+the vector corresponding to the matrix $\Xbf$ left shifted by one pixel
+with the right column filled with zeros.
+
+\item Write the python command that can covert a $4 \x 4$ image matrix, \pycode{Xmat}
+to the 16-dimensional vector, \pycode{x}.  What is the python command
+to go from \pycode{x} to \pycode{Xmat}.
+\end{enumerate}
+
+\item
+Consider the data set with scalar features $x_i$
+and binary class labels $y_i=\pm 1$.
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|} \hline
+$x_i$ & 0 & 1 & 2 & 3 \\ \hline
+$y_i$ & 1 & -1 & 1 & -1 \\ \hline
+\end{tabular}
+\end{center}
+
+A support vector classifier is of the form
+\[
+    \hat{y} = \begin{cases}
+        1  & z > 0 \\
+        -1 & z < 0,
+        \end{cases}
+    \quad
+    z = \sum_i \alpha_i y_i K(x_i,x),
+\]
+where $K(x,x')$ is the radial basis function, $K(x,x') = e^{-\gamma(x-x')^2}$, and
+$\gamma > 0$ and $\alphabf = [\alpha_1,\ldots,\alpha_4]$ are parameters of the classifier.
+
+\begin{enumerate}[(a)]
+\item Use python to plot $z$ vs.\ $x$ and
+$\hat{y}$ vs.\ $x$ when $\gamma = 3$ and $\alphabf = [0,0,1,1]$.
+\item Repeat (a) with $\gamma = 0.3$ and $\alphabf = [1,1,1,1]$.
+\item Which classifier makes more errors on the training data.
+\end{enumerate}
 \end{enumerate}
 \end{document}
+
